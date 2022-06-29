@@ -1,55 +1,58 @@
 // only import Schema constructor and model function
 const { Schema, model } = require("mongoose");
+const dateFormat = require("../utils/dateFormat");
 
 // create the schema for the model
-const PizzaSchema = new Schema({
+const PizzaSchema = new Schema(
+  {
     // The name of the pizza
     pizzaName: {
-        type: String,
+      type: String,
     },
 
     // The name of the user that created the pizza
     createdBy: {
-        type: String,
+      type: String,
     },
 
     // A timestamp of when the pizza was created
     createdAt: {
-        type: Date,
-        default: Date.now,
+      type: Date,
+      default: Date.now,
+      get: (createdAtVal) => dateFormat(createdAtVal),
     },
 
     // A timestamp of any updates to the pizza's data
 
     // The pizza's suggested size
     size: {
-        type: String,
-        default: "Large",
+      type: String,
+      default: "Large",
     },
 
     // The pizza's toppings with array as data type
     toppings: [],
 
     comments: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'Comment'
-        },
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Comment",
+      },
     ],
-},
-  
+  },
+
   {
     toJSON: {
       virtuals: true,
-    }, 
-    id: false
+      getters: true,
+    },
+    id: false,
   }
-    
 );
 
 // get total count of comments and replies on retrieval
-PizzaSchema.virtual('commentcount').get(function () {
-    return this.comments.length;
+PizzaSchema.virtual("commentCount").get(function () {
+  return this.comments.length;
 });
 
 // create the Pizza model using the PizzaSchema
