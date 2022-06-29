@@ -7,6 +7,14 @@ const pizzaController = {
 
     getAllPizza(req, res) {
         Pizza.find({})
+            .populate({
+                path: 'comments',
+                // tell mongoose we dont care about the v field (- tells it to exclude)
+                select: '-__v'
+            })
+            .select('-__v')
+            // sort in descending order by id 
+            .sort({ _id: -1 })
             .then(dbPizzaData => res.json(dbPizzaData))
             .catch(err => {
                 console.log(err);
@@ -18,17 +26,22 @@ const pizzaController = {
     // destructure the params out of the req 
     getPizzaById({ params }, res) {
         Pizza.findOne({ _id: params.id })
-            .then(dbPizzaData => {
-                if (!dbPizzaData) {
-                    res.status(404).json({ message: 'No pizza found with this id!' });
-                    return;
-                }
-                res.json(dbPizzaData);
-            })
-            .catch(err => {
-                console.log(err);
-                res.status(400).json(err);
-            });
+          .populate({
+            path: "comments",
+            select: "-__v",
+          })
+          .select("-__v")
+          .then((dbPizzaData) => {
+            if (!dbPizzaData) {
+              res.status(404).json({ message: "No pizza found with this id!" });
+              return;
+            }
+            res.json(dbPizzaData);
+          })
+          .catch((err) => {
+            console.log(err);
+            res.status(400).json(err);
+          });
     },
 
     // create pizza 
