@@ -8,6 +8,8 @@ const PizzaSchema = new Schema(
     // The name of the pizza
     pizzaName: {
       type: String,
+      required: 'You need to provide a pizza name!',
+      trim: true
     },
 
     // The name of the user that created the pizza
@@ -28,6 +30,8 @@ const PizzaSchema = new Schema(
     size: {
       type: String,
       default: "Large",
+      required: true,
+      enum: ['Personal', 'Small', 'Medium', 'Large', 'Extra Large']
     },
 
     // The pizza's toppings with array as data type
@@ -50,16 +54,15 @@ const PizzaSchema = new Schema(
   }
 );
 
-// get total count of comments and replies on retrieval
-PizzaSchema.virtual("commentCount").get(function () {
-  return this.comments.reduce(
-    (total, comment) => total + comment.replies.length + 1,
-    0
-  );
-});
-
 // create the Pizza model using the PizzaSchema
 const Pizza = model("Pizza", PizzaSchema);
+
+
+// get total count of comments and replies on retrieval
+PizzaSchema.virtual("commentCount").get(function () {
+  return this.comments.reduce((total, comment) => total + comment.replies.length + 1, 0
+  );
+});
 
 // export the Pizza model
 module.exports = Pizza;

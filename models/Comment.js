@@ -1,52 +1,60 @@
 const { Schema, model, Types } = require("mongoose");
 const dateFormat = require("../utils/dateFormat");
 
-const ReplySchema = new Schema({
-  // set up custom id to avoid confusion with parent comment_id
-  // remember to import Types model first!
-  replyId: {
-    type: Schema.Types.ObjectId,
-    default: () => new Types.ObjectId()
-  },
-  replyBody: {
-    type: String,
-  },
-  writtenBy: {
-    type: String,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    get: (createdAtVal) => dateFormat(createdAtVal),
-  }
-},
+const ReplySchema = new Schema(
   {
-    toJSON: {
-    getters: true
-  }
-});
-
-const CommentSchema = new Schema({
-  writtenBy: {
-    type: String,
-  },
-  commentBody: {
-    type: String,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    get: createdAtVal => dateFormat(createdAtVal)
+    // set custom id to avoid confusion with parent comment _id
+    replyId: {
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId(),
     },
-  replies: [ReplySchema]
-},
+    replyBody: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    writtenBy: {
+      type: String,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      get: (createdAtVal) => dateFormat(createdAtVal),
+    },
+  },
   {
     toJSON: {
       getters: true,
-      viruals: true
     },
-    id: false
-  });
+  }
+);
+
+const CommentSchema = new Schema(
+  {
+    writtenBy: {
+      type: String,
+      required: true,
+    },
+    commentBody: {
+      type: String,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      get: (createdAtVal) => dateFormat(createdAtVal),
+    },
+    replies: [ReplySchema],
+  },
+  {
+    toJSON: {
+      getters: true,
+      viruals: true,
+    },
+    id: false,
+  }
+);
 
 CommentSchema.virtual('replyCount').get(function () {
   return this.replies.length;
